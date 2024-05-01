@@ -1,26 +1,15 @@
 import { createSlice} from '@reduxjs/toolkit';
-import { addHours } from 'date-fns';
 
 
-const tempEvent = {
-    _id:new Date().getTime() ,
-    title: 'cumpleaños del boss',
-    notes: 'hay que comprar pastel',
-    start: new Date(),
-    end: addHours(new Date(), 1),
-    bgColor: '#fafafa',
-    user: {
-      id: '123',
-      name: 'bruno ruiz'
-    }
-}
+
 
 export const calendarSlice = createSlice({
 
     name: 'calendar',
     initialState: {
+        isLoadingEvents: true,
         events: [
-            tempEvent
+            
         ],
         activeEvent: null
     },
@@ -36,19 +25,42 @@ export const calendarSlice = createSlice({
         onUpdateEvent: (state, {payload}) => {
             state.events = state.events.map(event => {
                 
-                if(event._id === payload._id){
+                if(event.id === payload.id){
                     return payload;
                 }
 
                 return event;
             });
+            
         },
         onDeleteEvent: (state) => {
             if(state.activeEvent){
-                state.events = state.events.filter(event => event._id !== state.activeEvent._id);
+                state.events = state.events.filter(event => event.id !== state.activeEvent.id);
                 state.activeEvent = null
             }
             
+            
+            
+        },
+        onLoadEvents: (state,{payload = []}) => {
+            state.isLoadingEvents = false;
+            //state.events = payload
+            //*recorremos el payload del arreglo de eventos que tengamos en la base de datos
+            payload.forEach(event => {
+                //*aca iteramos el evento del payload, y si existe un evento de la db que coincidan sus id, no hago nada
+                //* y si no, lo pusheo al arreglo de eventos ese evento que itero del payload
+                //*el.some devuelve true si al menos un elemento del arreglo coincide con la condicion que le estemos pasando
+                //*y si no, devuelve un false 
+                const exists = state.events.some(dbEvent => dbEvent.id === event.id);
+                if(!exists){
+                    state.events.push(event)
+                }
+            })
+        },
+        onLogOutCalendar: (state) => {
+            state.isLoadingEvents = true;
+            state.events = [];
+            state.activeEvent = null;
         }
          
     }
@@ -57,4 +69,4 @@ export const calendarSlice = createSlice({
 
 
 
-export const { onSetActiveEvent,onAddNewEvent,onUpdateEvent,onDeleteEvent } = calendarSlice.actions;
+export const { onSetActiveEvent,onAddNewEvent,onUpdateEvent,onDeleteEvent,onLoadEvents, onLogOutCalendar } = calendarSlice.actions;

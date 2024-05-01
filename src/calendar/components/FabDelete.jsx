@@ -6,10 +6,11 @@ import { useUiStore } from "../../hooks/useUiStore"
 export const FabDelete = () => {
 
     const { openDateModal } = useUiStore();
-    const {startDeletingEvent,hasEventSelected  } = useCalendarStore()
+    const {startDeletingEvent,hasEventSelected,activeEvent  } = useCalendarStore()
 
     const handleDelete = () => {
-        startDeletingEvent()
+        startDeletingEvent();
+        
     }
 
 
